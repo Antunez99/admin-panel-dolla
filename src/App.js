@@ -6,20 +6,52 @@ import Donias from './pages/Donias';
 import Comidas from './pages/Comidas';
 import Ordenes from './pages/Ordenes';
 import Faqs from './pages/Faqs';
-import Login from './Login';
+import 'firebaseui/dist/firebaseui.css';
+import Firebase from './server/firebase';
 
-class App extends Component{
-  constructor(){
-    super();
-    this.state = {
-      title: 'Dashboard',
-      menu: <Dashboard />
-    };
-    
+
+
+
+class App extends React.Component{
+  state = {
+  autenticado : false,
+  usuario : "",
+  firebase: null
   }
-
-  componentDidMount() {
-
+  componentDidMount(){
+    
+      const firebase = new Firebase();
+  
+      firebase.auth.onAuthStateChanged(authUser =>{
+  
+          authUser
+          ? this.setState({
+              autenticado : true,
+              usuario: firebase.auth.currentUser.email,
+              firebase : firebase
+          })
+          :firebase.firebaseui.start("#firebaseui-auth-container",{
+              signInSuccessUrl : "/",
+              credentialHelper: "none",
+              callbacks: {
+                  signInSuccessWithAuthResult : (authResult , redirectUrl) =>{
+  
+                      this.setState({
+                          autenticado : true,
+                          usuario: firebase.auth.currentUser.email,
+                          firebase : firebase
+                      })
+                      return false;
+                  }
+              },
+          signInOptions:[
+              {
+                  provider : firebase.autorization.EmailAuthProvider.PROVIDER_ID
+              }
+          ]
+      })
+  })
+  
   }
 
   screen(option){
@@ -43,7 +75,8 @@ class App extends Component{
   }
 
     render(){
-      return (
+      return (this.state.autenticado
+        ?(
         <div className="App">
           <Container>
             <Row>
@@ -70,16 +103,28 @@ class App extends Component{
                   </Nav.Item>
                 </Nav>
               </Col>
+              
               <Col className='Gestion' xs={9}>
                 <h1>{this.state.title}</h1>
                 {this.state.menu}
               </Col>
+              <button  href="/#" onClick={()=> { this.state.firebase.auth.signOut().then (success=>{
+                                                 this.setState({
+                                                autenticado: false
+                                            })
+                                        })
+                                    }
+                    }>Salir</button>
             </Row>
           </Container>
         </div>
-      );
-  }
-}
-
-export default App;
-
+        
+        
+      ):<div id="firebaseui-auth-container"></div>
+      )}
+    
+    }
+    document.getElementById('root')
+    export default App;
+  
+  
