@@ -5,7 +5,6 @@ import Dashboard from './pages/Dashboard';
 import Donias from './pages/Donias';
 import Comidas from './pages/Comidas';
 import Ordenes from './pages/Ordenes';
-import Faqs from './pages/Faqs';
 import 'firebaseui/dist/firebaseui.css';
 import Firebase from './server/firebase';
 
@@ -61,9 +60,6 @@ class App extends React.Component{
           break;
         case 'donia':
           this.setState({menu: <Donias />, title: 'Administracion de doñas'})
-          break;
-        case 'faqs':
-          this.setState({menu: <Faqs />, title: 'FAQ\'s activas'})
           break;
         case 'ordenes':
           this.setState({menu: <Ordenes />, title: 'Administracion de ordenes'})
